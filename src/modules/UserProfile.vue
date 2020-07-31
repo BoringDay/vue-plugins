@@ -1,15 +1,16 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
+    <h1>profile</h1>
+    <p><router-link to="/">to Home</router-link></p>
+    <p><router-link to="/HelloWorld2">to HelloWorld2</router-link></p>
+    <p><router-link to="/HelloWorld2/posts">to posts</router-link></p>
+    <p><router-link to="/HelloWorld2/profile">to profile</router-link></p>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  }
+  name: 'HelloWorld'
 }
 </script>
 

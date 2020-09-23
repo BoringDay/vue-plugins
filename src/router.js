@@ -4,14 +4,21 @@ import HelloWorld from '@/modules/HelloWorld'
 import HelloWorld2 from '@/modules/HelloWorld2'
 import UserProfile from '@/modules/UserProfile'
 import UserPosts from '@/modules/UserPosts'
+import UserDetail from '@/modules/UserDetail'
 
 Vue.use(VueRouter)
 
 const routes = [
-  { path: '/', component: HelloWorld},
-  { 
-    path: '/HelloWorld2', 
-    component: HelloWorld2, 
+  {
+    path: '/', component: HelloWorld
+  },
+  {
+    path: '/user/:id',
+    component: UserDetail
+  },
+  {
+    path: '/HelloWorld2',
+    component: HelloWorld2,
     children: [
       {
         path: 'profile',
@@ -21,7 +28,8 @@ const routes = [
         path: 'posts',
         component: UserPosts
       }
-    ] }
+    ]
+  }
 ]
 
 const router = new VueRouter({

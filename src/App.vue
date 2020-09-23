@@ -2,12 +2,17 @@
   <div id="app">
     <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
     <router-view></router-view>
+    <testHoc a='1' ></testHoc>
   </div>
 </template>
 
 <script>
+import testHoc from '@/modules/testHoc'
 export default {
-  name: 'App'
+  name: 'App',
+  components: {
+    testHoc
+  }
 }
 </script>
 

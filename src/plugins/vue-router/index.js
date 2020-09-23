@@ -1,10 +1,14 @@
 import routerLink from './components/router-link'
 import routerView from './components/router-view'
-import Vue from 'vue';
+import { HashHistory } from './history/hash'
+import Vue from 'vue'
+import { parseQuery } from './lib/query'
 
 class VueRouter {
-  constructor(options){
-    this.$options  = options 
+  constructor (options) {
+    this.$options = options
+    this.mode = options.mode || 'hash'
+    this.query = {} // 路径参数
 
     // this.current 记录的当前的URL标识符
     const initPath = window.location.hash.slice(1) || '/'
@@ -13,66 +17,97 @@ class VueRouter {
     Vue.util.defineReactive(this, 'matched', [])
     Vue.util.defineReactive(this, 'current', initPath)
 
-    window.addEventListener('hashchange',this.onHashchange.bind(this))
+    window.addEventListener('hashchange', this.onHashchange.bind(this))
     this.onHashchange()
+
+    if (this.mode === 'hash') {
+      this.history = new HashHistory(this, options)
+    }
   }
 
-  onHashchange(){
+  onHashchange () {
     this.current = window.location.hash.slice(1) || '/'
     this.matched = []
     this.match()
   }
 
-  match(){
+  match (location) {
     const routes = this.$options.routes || []
-    // const paths = this.current.split('/').slice(1)
     const matched = []
-    let depth = 0
-    let pathString = this.current
+    const depth = 0
+    let pathString = location || this.current
+
+    this.query = parseQuery(pathString.replace(/.*\?/, ''))
+
+    pathString = pathString.split('?').shift()
+
+    console.log('pathString', pathString)
 
     // 根据当前访问路径划分router-view的层级组件组
-    // const getRouter = (routers)=>{
-    //   for(const router of routers){
-    //     if(router.path === `${paths[depth]}` || router.path === `/${paths[depth]}`){
-    //       matched.push(router)
-    //       if(router.children) getRouter(router.children,++depth)
-    //       return router
-    //     }
-    //   }
-    // }
-    
-    const getRouter = (routers)=>{
-      for(const router of routers){
-        if(this.current==='/' && this.current ===router.path){
+    const getRouter = (routers) => {
+      for (const router of routers) {
+        if (pathString === '/' && pathString === router.path) {
           matched.push(router)
           return
         }
 
-        if(router.path!='/' &&  ~pathString.indexOf(router.path)){
-          console.log(router.path)
+        if (router.path !== '/' && ~pathString.indexOf(router.path)) {
           matched.push(router)
           pathString = pathString.slice(router.path.length)
-          if(router.children) getRouter(router.children)
+          if (router.children) getRouter(router.children)
           return router
         }
       }
     }
 
-    this.matched = matched
+    getRouter(routes, depth)
 
-    getRouter(routes,depth)
+    this.matched = matched
+    this.current = location
+  }
+
+  push (location, onComplete, onAbort) {
+    if (!onComplete && !onAbort && typeof Promise !== 'undefined') {
+      return new Promise((resolve, reject) => {
+        this.history.push(location, resolve, reject)
+      })
+    } else {
+      this.history.push(location, onComplete, onAbort)
+    }
+  }
+
+  replace (location, onComplete, onAbort) {
+    if (!onComplete && !onAbort && typeof Promise !== 'undefined') {
+      return new Promise((resolve, reject) => {
+        this.history.replace(location, resolve, reject)
+      })
+    } else {
+      this.history.replace(location, onComplete, onAbort)
+    }
+  }
+
+  go (n) {
+    this.history.go(n)
+  }
+
+  back () {
+    this.go(-1)
+  }
+
+  forward () {
+    this.go(1)
   }
 }
 
-VueRouter.install = function(_Vue){
+VueRouter.install = function (_Vue) {
   const Vue = _Vue
-  Vue.component(routerLink.name,routerLink)
-  Vue.component(routerView.name,routerView)
+  Vue.component(routerLink.name, routerLink)
+  Vue.component(routerView.name, routerView)
   Vue.mixin({
-    beforeCreate(){
-      //$options 用于当前 Vue 实例的初始化选项。需要在选项中包含自定义 property 时会有用处：
-      if(this.$options.router){
-        Vue.prototype.$router  = this.$options.router 
+    beforeCreate () {
+      // $options 用于当前 Vue 实例的初始化选项。需要在选项中包含自定义 property 时会有用处：
+      if (this.$options.router) {
+        Vue.prototype.$router = this.$options.router
       }
     }
   })

@@ -2,7 +2,12 @@
   <div id="app">
     <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
     <router-view></router-view>
-    <testHoc a='1' ></testHoc>
+    <testHoc a='1' >
+      <template v-slot:slot1>
+        <h1>About Me</h1>
+      </template>
+      AFTER about me 
+    </testHoc>
   </div>
 </template>
 

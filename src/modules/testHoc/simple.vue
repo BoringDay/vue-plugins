@@ -1,12 +1,27 @@
 <template>
   <div class="hello">
     <h1>HelloWorld</h1>
+    <span @click="handleClick">props: {{test}}</span>
+    <slot name="slot1"/> <!-- 具名插槽 -->
+    <p>===========</p>
+    <slot/> <!-- 默认插槽 -->
   </div>
 </template>
 
 <script>
 export default {
-  name: 'HelloWorld'
+  name: 'HelloWorld',
+  props:['a'],
+  data(){
+    return {
+      test:'111'
+    }
+  },
+  methods:{
+    handleClick(){
+      console.log('handleClick')
+    }
+  }
 }
 </script>
 

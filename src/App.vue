@@ -6,7 +6,7 @@
       <template v-slot:slot1>
         <h1>About Me</h1>
       </template>
-      AFTER about me 
+      <span>AFTER about me </span>
     </testHoc>
   </div>
 </template>
